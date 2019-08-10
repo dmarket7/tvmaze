@@ -51,16 +51,21 @@ async function searchShows(query) {
 function populateShows(shows) {
   const $showsList = $("#shows-list");
   $showsList.empty();
+  
   for (let show of shows) {
     let $item = $(
       `<div class="col-md-6 col-lg-3 Show" data-show-id="${show.id}">
         <div class="card" data-show-id="${show.id}">
-          <img class="card-img-top" src="${show.image}">
-          <div class="info-card-body"> 
-            <h2>Genre: </h2>
-            <h4>${show.genre}</h4><br>
-            <h3>Click Here for Episodes Info</h3>
+          <div class="info-card-body">
+             
+            <div class="genre-text-body" data="${show.name}">
+              <h2>Genre: </h2>
+              <h4>${show.genre}</h4><br>
+              <h3>Click Here for Episodes Info</h3>
+            </div>
+            <img class="card-img-top" src="${show.image}"> 
           </div>
+          
           <div class="card-body">
              <h5 class="card-title">${show.name}</h5>
              <p class="card-text">${show.summary}</p>
@@ -71,11 +76,13 @@ function populateShows(shows) {
 
     $showsList.append($item);
   }
-  $("#shows-list").on("click", async function(evt){
+  $(".info-card-body").on("click", async function(evt){
     let showId = $(evt.target).closest('.Show').attr('data-show-id');
+    
     let episodesArray = await getEpisodes(showId);
+    let showName = $(evt.target).closest('.genre-text-body').attr('data');
 
-    populateEpisodes(episodesArray);
+    populateEpisodes(episodesArray, showName);
   });
 }
 
@@ -120,7 +127,7 @@ async function getEpisodes(id) {
   // TODO: return array-of-episode-info, as described in docstring above
 }
 
-function populateEpisodes(array) {
+function populateEpisodes(array, showName) {
   const $episodesList = $('#episodes-list');
   $episodesList.empty();
 
@@ -130,6 +137,7 @@ function populateEpisodes(array) {
 
     $episodesList.append($item);
   }
+  $('.modal-title').html(`Episodes for ${showName}:`);
   $('#episodes-area').show();
   $('#my-modal').modal('show');
 }
